@@ -5,6 +5,6 @@ Simple example cookiecutter template for generating a PR to change replicas coun
 
 ### Parameters
 
-The default paramters deploy an IMDB clone written with a flask backend.
+The default paramters for scaling
 
 - `replicas` - Number of replicas to deploy. **Should be more than 1 for the service to be up**
