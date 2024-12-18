@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inflate
+  namespace: default
+spec:
+  replicas: {{cookiecutter.replicas}}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inflate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inflate
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIngoreDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - store
+              topologyKey: "kubernetes.io/hostname"
+        terminationGracePeriodSeconds: 0
+        nodeSelector:
+          kubernetes.io/os: linux
+          karpenter.sh/nodepool: platform-new-test-eks-karpenter-bottlerocket-spot
+        containers:
+          - name: inflate
+            image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
+            resources:
+              requests:
+                cpu: 500m
+
