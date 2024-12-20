@@ -1,4 +1,4 @@
 {
     "version": "0.1.0",
-    "replicas": 15
+    "repo": "my-repo"
 }

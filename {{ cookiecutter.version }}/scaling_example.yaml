@@ -1,36 +1,27 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
 metadata:
-  name: inflate
-  namespace: default
+  name: sampleapps-platform-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
-  replicas: {{cookiecutter.replicas}}
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: inflate
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+  - clusters: {}
   template:
     metadata:
-      labels:
-        app.kubernetes.io/name: inflate
+      name: sampleapps-platform-dev
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIngoreDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - store
-              topologyKey: "kubernetes.io/hostname"
-        terminationGracePeriodSeconds: 0
-        nodeSelector:
-          kubernetes.io/os: linux
-          karpenter.sh/nodepool: platform-new-test-eks-karpenter-bottlerocket-spot
-        containers:
-          - name: inflate
-            image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
-            resources:
-              requests:
-                cpu: 500m
-
+      project: default
+      source:
+        repoURL: {{cookiecutter.repo}}
+        targetRevision: develop
+        path: examples/linux-basic/argo_workloads/sampleapps
+        directory:
+          recurse: true
+      destination:
+        namespace: 'sampleapps'
+        name: "{{ .name }}"
